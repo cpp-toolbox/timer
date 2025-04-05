@@ -27,6 +27,14 @@ class Timer {
         return remaining > 0.0 ? remaining : 0.0;
     }
 
+    double get_percent_complete() const {
+        if (!running)
+            return 0.0;
+        auto elapsed = std::chrono::steady_clock::now() - start_time;
+        double progress = std::chrono::duration<double>(elapsed).count() / duration.count();
+        return progress < 1.0 ? progress : 1.0;
+    }
+
   private:
     std::chrono::duration<double> duration;
     std::chrono::steady_clock::time_point start_time;
