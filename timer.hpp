@@ -5,9 +5,13 @@
 
 class Timer {
   public:
-    explicit Timer(double duration_seconds)
-        : duration(std::chrono::duration<double>(duration_seconds)), start_time(), running(false) {}
+    explicit Timer(double duration_seconds, bool start_immediately = false)
+        : duration(std::chrono::duration<double>(duration_seconds)), start_time(), running(false) {
+        if (start_immediately)
+            this->start();
+    }
 
+    // NOTE: you have to run start or else nothing will occur
     void start() {
         start_time = std::chrono::steady_clock::now();
         running = true;
