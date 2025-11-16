@@ -45,11 +45,7 @@ class Timer {
      *
      * If `start_immediately` is false (default), you must call start() manually.
      */
-    explicit Timer(double duration_seconds, bool start_immediately = false)
-        : duration(std::chrono::duration<double>(duration_seconds)), start_time(), running(false) {
-        if (start_immediately)
-            this->start();
-    }
+    explicit Timer(double duration_seconds, bool start_immediately = false);
 
     /**
      * @brief Start or restart the timer.
@@ -57,23 +53,23 @@ class Timer {
      * Resets the timer's start time to the current moment and marks it as running.
      * You must call this function before using time_up(), get_remaining_time(), or get_percent_complete().
      */
-    void start() {
-        start_time = std::chrono::steady_clock::now();
-        running = true;
-    }
+    void start();
 
     /**
      * @brief Check whether the timer duration has elapsed.
      *
      * @return true if the timer has been started and the elapsed time >= duration.
      * @return false if the timer has not been started or is still running.
+     *
      */
-    bool time_up() const {
-        if (!running)
-            return false;
-        return std::chrono::steady_clock::now() - start_time >= duration;
-    }
+    bool time_up() const;
 
+    /**
+     * @brief internally runs time_up, and then if it is it starts the timer over again
+     *
+     * @return @see time_up
+     */
+    bool time_up_and_try_to_restart();
     /**
      * @brief Get the remaining time before the timer expires.
      *
@@ -81,13 +77,17 @@ class Timer {
      * - Returns the full duration if the timer hasn’t started.
      * - Returns 0 if the timer has expired.
      */
-    double get_remaining_time() const {
-        if (!running)
-            return duration.count();
-        auto elapsed = std::chrono::steady_clock::now() - start_time;
-        double remaining = duration.count() - std::chrono::duration<double>(elapsed).count();
-        return remaining > 0.0 ? remaining : 0.0;
-    }
+    double get_remaining_time() const;
+
+    /**
+     * @brief changes the duration of the timer
+     *
+     * @note it can be changed during active operation but note the following effects may occur. If the duration is
+     * reduced, then it may make the timer immediately end on the next time up call(). The percent complete or remaining
+     * time value may no longer be an increasing function when you make the duration longer during operation
+     *
+     */
+    void change_duration(double duration_seconds);
 
     /**
      * @brief Get the completion percentage of the timer.
@@ -96,13 +96,7 @@ class Timer {
      * - Returns 0.0 if the timer hasn’t started.
      * - Returns 1.0 once the duration has been reached or exceeded.
      */
-    double get_percent_complete() const {
-        if (!running)
-            return 0.0;
-        auto elapsed = std::chrono::steady_clock::now() - start_time;
-        double progress = std::chrono::duration<double>(elapsed).count() / duration.count();
-        return progress < 1.0 ? progress : 1.0;
-    }
+    double get_percent_complete() const;
 
   private:
     /** @brief The total duration of the timer. */
