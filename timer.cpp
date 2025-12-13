@@ -1,4 +1,5 @@
 #include "timer.hpp"
+#include <stdexcept>
 
 Timer::Timer(double duration_seconds, bool start_immediately)
     : duration(std::chrono::duration<double>(duration_seconds)), start_time(), running(false) {
